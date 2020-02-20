@@ -10,3 +10,8 @@ composer install
 ```
 docker-compose up -d
 ```
+
+## 3. Start server on port 8100
+```
+symfony server:start
+```
