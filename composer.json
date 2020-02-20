@@ -1,0 +1,11 @@
+{
+    "name": "lyubomir.hadzhiev/projects-managment",
+    "description": "Custom jira system",
+    "authors": [
+        {
+            "name": "Lyubomir Hadziev",
+            "email": "lyubomir.hadziev@sumup.com"
+        }
+    ],
+    "require": {}
+}
