@@ -12,3 +12,10 @@ services:
   App\Controller\:
     resource: '../src/Controller'
     tags: ['controller.service_arguments']
+
+  app.guzzle:
+    class: \GuzzleHttp\Client
+
+  App\Services\Requester\Project:
+    arguments:
+      $client: '@app.guzzle'

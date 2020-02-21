@@ -104,7 +104,7 @@ class Project
     /**
      * @return Collection|Task[]
      */
-    public function getTasks(): Collection
+    public function tasks(): Collection
     {
         return $this->tasks;
     }

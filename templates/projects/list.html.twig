@@ -1,0 +1,32 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>Projects</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Client</th>
+            <th scope="col">Company</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for project in projects %}
+
+            <tr>
+                <td>{{ project.id }}</td>
+                <td>{{ project.title }}</td>
+                <td>{{ project.description|default('-') }}</td>
+                <td>{{ project.client|default('-') }}</td>
+                <td>{{ project.company|default('-') }}</td>
+                <td></td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

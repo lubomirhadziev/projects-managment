@@ -22,13 +22,13 @@ class ProjectController extends ApiController
     private $projectRepository;
 
     /**
-     * @param ProjectRepository $projectRepository
+     * @param ProjectRepository $taskRepository
      * @param Serializer $serializer
      */
-    public function __construct(ProjectRepository $projectRepository, Serializer $serializer, ApiResponse $apiResponse)
+    public function __construct(ProjectRepository $taskRepository, Serializer $serializer, ApiResponse $apiResponse)
     {
         parent::__construct($serializer, $apiResponse);
-        $this->projectRepository = $projectRepository;
+        $this->projectRepository = $taskRepository;
     }
 
     /**
@@ -42,11 +42,14 @@ class ProjectController extends ApiController
 
         $this->projectRepository->saveProject($project);
 
-        return $this->apiResponse->model(ApiResponse::SUCCESS_CODE, $project);
+        return $this->apiResponse->model(
+            ApiResponse::SUCCESS_CODE,
+            $this->serializer->serializeModel($project)
+        );
     }
 
     /**
-     * @Route("/{id}", name="create_project", methods={"PUT"})
+     * @Route("/{id}", name="update_project", methods={"PUT"})
      * @param int $id
      * @param Request $request
      * @return JsonResponse
@@ -88,4 +91,23 @@ class ProjectController extends ApiController
             $this->serializer->serializeModel($projects)
         );
     }
+
+    /**
+     * @Route("/{id}", name="delete_project_by_id", methods={"DELETE"})
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function delete(int $id): JsonResponse
+    {
+        $project = $this->projectRepository->findOneBy(['id' => $id]);
+
+        if (!$project) {
+            return $this->apiResponse->simple(ApiResponse::FAIL_CODE);
+        }
+
+        $this->projectRepository->removeProject($project);
+
+        return $this->apiResponse->simple(ApiResponse::SUCCESS_CODE);
+    }
+
 }

@@ -44,4 +44,14 @@ class ProjectRepository extends ServiceEntityRepository
 
         return $project;
     }
+
+    /**
+     * @param Project $project
+     */
+    public function removeProject(Project $project)
+    {
+        $this->manager->remove($project);
+        $this->manager->flush();
+    }
+
 }

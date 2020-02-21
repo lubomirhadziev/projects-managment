@@ -32,6 +32,16 @@ class Serializer
             $options['object_to_populate'] = $objectToPopulate;
         }
 
+        if (is_array($data)) {
+            $result = [];
+
+            foreach ($data as $item) {
+                $result[] = $this->serializer->deserialize(json_encode($item), $model, $format, $options);
+            }
+
+            return $result;
+        }
+
         return $this->serializer->deserialize($data, $model, $format, $options);
     }
 
