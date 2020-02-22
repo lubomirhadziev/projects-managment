@@ -3,7 +3,6 @@
 namespace App\Services\Requester;
 
 use GuzzleHttp\Client;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 abstract class Api
 {
@@ -23,13 +22,14 @@ abstract class Api
 
     }
 
-    protected function makeRequest(string $endpoint)
+    protected function makeRequest(string $endpoint, string $type = 'GET', array $data = [])
     {
         $response = $this->client->request(
-            'GET',
+            $type,
             $this->uri($endpoint),
             [
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/json',
+                'json' => $data
             ]
         );
 

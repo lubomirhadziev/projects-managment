@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
+use App\Services\ApiResponse;
 use App\Services\Requester\Project as ProjectRequester;
 use App\Entity\Project;
 use App\Services\Serializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProjectController extends AbstractController
@@ -48,6 +52,45 @@ class ProjectController extends AbstractController
         return $this->render('projects/list.html.twig', [
             'projects' => $projects
         ]);
+    }
+
+    /**
+     * @Route("/project/new", name="create_project")
+     */
+    public function createProject(Request $request)
+    {
+        $project = new Project();
+        $form = $this->createForm(ProjectType::class, $project);
+        $errors = [];
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $newProject = $form->getData();
+
+            $response = $this->projectRequester->createProject($newProject);
+            $errors = $response['validation_errors'];
+
+            if ($response['code'] == ApiResponse::SUCCESS_CODE) {
+                return $this->redirectToRoute('list_projects');
+            }
+        }
+
+        return $this->render('projects/new.html.twig', [
+            'form' => $form->createView(),
+            'errors' => $errors
+        ]);
+    }
+
+    /**
+     * @Route("/project/delete/{id}", name="delete_project")
+     * @param int $id
+     * @return RedirectResponse
+     */
+    public function deleteProject(int $id)
+    {
+        $this->projectRequester->deleteProject($id);
+
+        return $this->redirectToRoute('list_projects');
     }
 
 }

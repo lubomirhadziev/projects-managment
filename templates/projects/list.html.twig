@@ -3,6 +3,8 @@
 {% block content %}
     <h1>Projects</h1>
 
+    <a href="{{ path('create_project') }}" class="btn btn-success">New</a>
+
     <table class="table">
         <thead>
         <tr>
@@ -23,7 +25,9 @@
                 <td>{{ project.description|default('-') }}</td>
                 <td>{{ project.client|default('-') }}</td>
                 <td>{{ project.company|default('-') }}</td>
-                <td></td>
+                <td>
+                    <a href="{{ path('delete_project', {id: project.id}) }}" class="btn btn-sm btn-danger">DELETE</a>
+                </td>
             </tr>
 
         {% endfor %}
