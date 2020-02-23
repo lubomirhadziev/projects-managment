@@ -3,7 +3,9 @@
 {% block content %}
     <h1>Tasks</h1>
 
-    <a href="{{ path('create_task', {projectId: projectId}) }}" class="btn btn-success">New</a>
+    {% if app.user %}
+        <a href="{{ path('create_task', {projectId: projectId}) }}" class="btn btn-success">New</a>
+    {% endif %}
 
     <table class="table">
         <thead>
@@ -26,10 +28,12 @@
                 <td>{{ task.status }}</td>
                 <td>{{ task.duration }} days</td>
                 <td>
-                    <a href="{{ path('delete_task', {projectId: task.project.id, taskId: task.id}) }}"
-                       class="btn btn-sm btn-danger">
-                        DELETE
-                    </a>
+                    {% if app.user %}
+                        <a href="{{ path('delete_task', {projectId: task.project.id, taskId: task.id}) }}"
+                           class="btn btn-sm btn-danger">
+                            DELETE
+                        </a>
+                    {% endif %}
                 </td>
             </tr>
 

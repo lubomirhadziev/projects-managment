@@ -20,7 +20,7 @@ class ApiResponse
      * @param null|array $validationErrors
      * @return JsonResponse
      */
-    public function model(int $code, string $data, $validationErrors = null): JsonResponse
+    public function model(int $code, $data, $validationErrors = null): JsonResponse
     {
         return $this->response($code, json_decode($data), $validationErrors);
     }

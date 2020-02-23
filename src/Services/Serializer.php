@@ -38,6 +38,10 @@ class Serializer
 
     public function serializeModel($model, string $format = 'json')
     {
+        if ($model == null) {
+            return null;
+        }
+
         return $this->serializer->serialize($model, $format);
     }
 

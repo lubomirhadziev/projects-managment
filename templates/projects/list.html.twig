@@ -3,7 +3,9 @@
 {% block content %}
     <h1>Projects</h1>
 
-    <a href="{{ path('create_project') }}" class="btn btn-success">New</a>
+    {% if app.user %}
+        <a href="{{ path('create_project') }}" class="btn btn-success">New</a>
+    {% endif %}
 
     <table class="table">
         <thead>
@@ -27,7 +29,11 @@
                 <td>{{ project.company|default('-') }}</td>
                 <td>
                     <a href="{{ path('list_tasks', {projectId: project.id}) }}" class="btn btn-sm btn-info">TASKS</a>
-                    <a href="{{ path('delete_project', {id: project.id}) }}" class="btn btn-sm btn-danger">DELETE</a>
+
+                    {% if app.user %}
+                        <a href="{{ path('delete_project', {id: project.id}) }}"
+                           class="btn btn-sm btn-danger">DELETE</a>
+                    {% endif %}
                 </td>
             </tr>
 

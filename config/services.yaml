@@ -16,10 +16,23 @@ services:
   app.guzzle:
     class: \GuzzleHttp\Client
 
+  app.request:
+    class: \Symfony\Component\Security\Core\Security
+
   App\Services\Requester\Project:
     arguments:
       $client: '@app.guzzle'
+      $security: '@app.request'
 
   App\Services\Requester\Task:
     arguments:
       $client: '@app.guzzle'
+      $security: '@app.request'
+
+  App\Services\Requester\User:
+    arguments:
+      $client: '@app.guzzle'
+      $security: '@app.request'
+
+  ibw.user.provider:
+    class: App\Repository\UserRepository

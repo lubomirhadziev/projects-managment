@@ -10,6 +10,7 @@ use App\Services\Serializer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @package App\Controller\Api
@@ -49,6 +50,7 @@ class TaskController extends ApiController
      * @Route("/", name="create_task", methods={"POST"})
      * @param Request $request
      * @return JsonResponse
+     * @IsGranted("ROLE_USER")
      */
     public function create(Request $request): JsonResponse
     {
@@ -72,6 +74,7 @@ class TaskController extends ApiController
      * @param int $id
      * @param Request $request
      * @return JsonResponse
+     * @IsGranted("ROLE_USER")
      */
     public function update(int $id, Request $request): JsonResponse
     {
@@ -127,6 +130,7 @@ class TaskController extends ApiController
      * @Route("/{id}", name="delete_task_by_id", methods={"DELETE"})
      * @param int $id
      * @return JsonResponse
+     * @IsGranted("ROLE_USER")
      */
     public function delete(int $id): JsonResponse
     {

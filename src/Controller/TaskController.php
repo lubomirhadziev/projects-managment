@@ -3,10 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Task;
-use App\Form\ProjectType;
 use App\Form\TaskType;
-use App\Repository\ProjectRepository;
-use App\Repository\TaskRepository;
 use App\Services\ApiResponse;
 use App\Services\Requester\Task as TaskRequester;
 use App\Services\Requester\Project as ProjectRequester;
@@ -27,7 +24,7 @@ class TaskController extends AbstractController
     private $taskRequester;
 
     /**
-     * @var ProjectRepository
+     * @var ProjectRequester
      */
     private $projectRequester;
 

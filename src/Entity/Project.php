@@ -109,7 +109,7 @@ class Project
     }
 
     /**
-     * @return Collection|Task[]
+     * @return Collection|User[]
      */
     public function tasks(): Collection
     {

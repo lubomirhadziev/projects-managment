@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Task;
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -16,7 +16,7 @@ class TaskType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Task::class,
+            'data_class' => User::class,
         ]);
     }
 
@@ -27,10 +27,10 @@ class TaskType extends AbstractType
             ->add('description', TextType::class)
             ->add('status', ChoiceType::class, [
                 'choices' => [
-                    'New' => Task::STATUS_NEW,
-                    'Pending' => Task::STATUS_PENDING,
-                    'Failed' => Task::STATUS_FAILED,
-                    'Done' => Task::STATUS_DONE,
+                    'New' => User::STATUS_NEW,
+                    'Pending' => User::STATUS_PENDING,
+                    'Failed' => User::STATUS_FAILED,
+                    'Done' => User::STATUS_DONE,
                 ],
             ])
             ->add('duration', IntegerType::class)
