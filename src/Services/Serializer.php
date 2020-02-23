@@ -3,9 +3,15 @@
 namespace App\Services;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
+
+use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class Serializer
 {
@@ -16,7 +22,18 @@ class Serializer
 
     public function __construct()
     {
-        $this->serializer = new SymfonySerializer([new GetSetMethodNormalizer()], [new JsonEncoder()]);
+        $classMetaDataFactory = new ClassMetadataFactory(
+            new AnnotationLoader(
+                new AnnotationReader()
+            )
+        );
+        $objectNormalizer = new ObjectNormalizer($classMetaDataFactory, null, null, new PhpDocExtractor());
+        $this->serializer = new SymfonySerializer([
+            new ArrayDenormalizer(),
+            $objectNormalizer,
+        ], [
+            new JsonEncoder(),
+        ]);
     }
 
     public function serializeModel($model, string $format = 'json')
@@ -24,15 +41,19 @@ class Serializer
         return $this->serializer->serialize($model, $format);
     }
 
-    public function deserializeModel($data, $model, $objectToPopulate = null, string $format = 'json')
+    public function deserializeModel($data, $model, $objectToPopulate = null, bool $multiple = false, string $format = 'json')
     {
+        if ($data == null) {
+            return null;
+        }
+
         $options = [];
 
         if ($objectToPopulate != null) {
             $options['object_to_populate'] = $objectToPopulate;
         }
 
-        if (is_array($data)) {
+        if ($multiple === true) {
             $result = [];
 
             foreach ($data as $item) {
@@ -42,7 +63,16 @@ class Serializer
             return $result;
         }
 
+        if (is_array($data)) {
+            $data = json_encode($data);
+        }
+
         return $this->serializer->deserialize($data, $model, $format, $options);
+    }
+
+    public function deserializeMultipleModel($data, $model, string $format = 'json')
+    {
+        return $this->deserializeModel($data, $model, null, true, $format);
     }
 
 }

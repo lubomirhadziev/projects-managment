@@ -19,3 +19,7 @@ services:
   App\Services\Requester\Project:
     arguments:
       $client: '@app.guzzle'
+
+  App\Services\Requester\Task:
+    arguments:
+      $client: '@app.guzzle'

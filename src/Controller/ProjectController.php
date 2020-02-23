@@ -31,6 +31,7 @@ class ProjectController extends AbstractController
     /**
      * @param ProjectRepository $projectRepository
      * @param ProjectRequester $projectRequester
+     * @param Serializer $serializer
      */
     public function __construct(ProjectRepository $projectRepository, ProjectRequester $projectRequester, Serializer $serializer)
     {
@@ -44,7 +45,7 @@ class ProjectController extends AbstractController
      */
     public function index()
     {
-        $projects = $this->serializer->deserializeModel(
+        $projects = $this->serializer->deserializeMultipleModel(
             $this->projectRequester->getAll(),
             Project::class
         );
@@ -56,6 +57,8 @@ class ProjectController extends AbstractController
 
     /**
      * @Route("/project/new", name="create_project")
+     * @param Request $request
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function createProject(Request $request)
     {

@@ -1,0 +1,39 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>Tasks</h1>
+
+    <a href="{{ path('create_task', {projectId: projectId}) }}" class="btn btn-success">New</a>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Status</th>
+            <th scope="col">Duration</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for task in tasks %}
+
+            <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description|default('-') }}</td>
+                <td>{{ task.status }}</td>
+                <td>{{ task.duration }} days</td>
+                <td>
+                    <a href="{{ path('delete_task', {projectId: task.project.id, taskId: task.id}) }}"
+                       class="btn btn-sm btn-danger">
+                        DELETE
+                    </a>
+                </td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

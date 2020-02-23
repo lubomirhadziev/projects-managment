@@ -26,6 +26,7 @@
                 <td>{{ project.client|default('-') }}</td>
                 <td>{{ project.company|default('-') }}</td>
                 <td>
+                    <a href="{{ path('list_tasks', {projectId: project.id}) }}" class="btn btn-sm btn-info">TASKS</a>
                     <a href="{{ path('delete_project', {id: project.id}) }}" class="btn btn-sm btn-danger">DELETE</a>
                 </td>
             </tr>

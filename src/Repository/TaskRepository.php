@@ -34,6 +34,15 @@ class TaskRepository extends ServiceEntityRepository
         $this->manager = $manager;
     }
 
+    public function getTasksByProject(Project $project)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.project = :project')
+            ->setParameter('project', $project);
+
+        return $qb->getQuery()->execute();
+    }
+
     /**
      * @param Task $task
      * @return Task

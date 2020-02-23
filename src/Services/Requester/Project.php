@@ -35,6 +35,16 @@ class Project extends Api
      * @param int $id
      * @return array
      */
+    public function findProject(int $id)
+    {
+        $response = $this->makeRequest(sprintf('%s%s', self::PROJECTS_ENDPOINT, $id));
+        return $response['data'];
+    }
+
+    /**
+     * @param int $id
+     * @return array
+     */
     public function deleteProject(int $id)
     {
         return $this->makeRequest(sprintf('%s%s', self::PROJECTS_ENDPOINT, $id), 'DELETE');

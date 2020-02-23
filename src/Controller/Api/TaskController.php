@@ -93,7 +93,7 @@ class TaskController extends ApiController
     }
 
     /**
-     * @Route("/{id}", name="find_task_by_id", methods={"GET"})
+     * @Route("/find/{id}", name="find_task_by_id", methods={"GET"})
      * @param int $id
      * @return JsonResponse
      */
@@ -108,11 +108,14 @@ class TaskController extends ApiController
     }
 
     /**
-     * @Route("/", name="get_all_tasks", methods={"GET"})
+     * @Route("/{projectId}", name="get_all_tasks", methods={"GET"})
+     * @param int $projectId
+     * @return JsonResponse
      */
-    public function getAll(): JsonResponse
+    public function getAll(int $projectId): JsonResponse
     {
-        $tasks = $this->taskRepository->findAll();
+        $project = $this->projectRepository->find($projectId);
+        $tasks = $this->taskRepository->getTasksByProject($project);
 
         return $this->apiResponse->model(
             ApiResponse::SUCCESS_CODE,

@@ -9,6 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Task
 {
+    const STATUS_NEW = 0;
+    const STATUS_PENDING = 1;
+    const STATUS_FAILED = 2;
+    const STATUS_DONE = 3;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -37,6 +42,7 @@ class Task
     private $duration;
 
     /**
+     * @var Project
      * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="tasks")
      * @ORM\JoinColumn(name="project_id", referencedColumnName="id", onDelete="CASCADE")
      */
