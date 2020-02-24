@@ -1,10 +1,10 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
-    <h1>Tasks</h1>
+    <h1>{{ project.title }} tasks</h1>
 
     {% if app.user %}
-        <a href="{{ path('create_task', {projectId: projectId}) }}" class="btn btn-success">New</a>
+        <a href="{{ path('create_task', {projectId: project.id}) }}" class="btn btn-success">New</a>
     {% endif %}
 
     <table class="table">
@@ -25,7 +25,7 @@
                 <td>{{ task.id }}</td>
                 <td>{{ task.title }}</td>
                 <td>{{ task.description|default('-') }}</td>
-                <td>{{ task.status }}</td>
+                <td>{{ task.status|taskStatus }}</td>
                 <td>{{ task.duration }} days</td>
                 <td>
                     {% if app.user %}

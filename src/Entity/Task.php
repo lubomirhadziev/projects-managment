@@ -13,6 +13,12 @@ class Task
     const STATUS_PENDING = 1;
     const STATUS_FAILED = 2;
     const STATUS_DONE = 3;
+    const STATUS_NAME_MAPPING = [
+        Task::STATUS_NEW => 'New',
+        Task::STATUS_PENDING => 'Pending',
+        Task::STATUS_FAILED => 'Failed',
+        Task::STATUS_DONE => 'Done',
+    ];
 
     /**
      * @ORM\Id()

@@ -55,6 +55,11 @@ class TaskController extends AbstractController
      */
     public function index(int $projectId)
     {
+        $project = $this->serializer->deserializeModel(
+            $this->projectRequester->findProject($projectId),
+            Project::class
+        );
+
         $tasks = $this->serializer->deserializeMultipleModel(
             $this->taskRequester->getAll($projectId),
             Task::class
@@ -62,7 +67,7 @@ class TaskController extends AbstractController
 
         return $this->render('tasks/list.html.twig', [
             'tasks' => $tasks,
-            'projectId' => $projectId
+            'project' => $project
         ]);
     }
 
