@@ -6,10 +6,12 @@ use App\Entity\Project;
 use App\Repository\ProjectRepository;
 use App\Services\ApiResponse;
 use App\Services\Serializer;
+use App\Services\Utils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @package App\Controller\Api
@@ -35,18 +37,28 @@ class ProjectController extends ApiController
     /**
      * @Route("/", name="create_project", methods={"POST"})
      * @param Request $request
+     * @param ValidatorInterface $validator
+     * @param Utils $utils
      * @return JsonResponse
      * @IsGranted("ROLE_USER")
      */
-    public function create(Request $request): JsonResponse
+    public function create(Request $request, ValidatorInterface $validator, Utils $utils): JsonResponse
     {
         $project = $this->serializer->deserializeModel($request->getContent(), Project::class);
 
-        $this->projectRepository->saveProject($project);
+        $errors = $validator->validate($project);
+        $validationErrors = [];
+
+        if (count($errors) > 0) {
+            $validationErrors = $utils->errorsToArray($errors);
+        } else {
+            $project = $this->projectRepository->saveProject($project);
+        }
 
         return $this->apiResponse->model(
-            ApiResponse::SUCCESS_CODE,
-            $this->serializer->serializeModel($project)
+            (!empty($validationErrors) ? ApiResponse::FAIL_CODE : ApiResponse::SUCCESS_CODE),
+            $this->serializer->serializeModel($project),
+            $validationErrors
         );
     }
 

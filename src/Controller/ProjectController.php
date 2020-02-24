@@ -11,6 +11,7 @@ use App\Services\Serializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
@@ -59,7 +60,7 @@ class ProjectController extends AbstractController
     /**
      * @Route("/project/new", name="create_project")
      * @param Request $request
-     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
     public function createProject(Request $request)
     {
@@ -74,7 +75,7 @@ class ProjectController extends AbstractController
             $response = $this->projectRequester->createProject($newProject);
             $errors = $response['validation_errors'];
 
-            if ($response['code'] == ApiResponse::SUCCESS_CODE) {
+            if (empty($errors)) {
                 return $this->redirectToRoute('list_projects');
             }
         }

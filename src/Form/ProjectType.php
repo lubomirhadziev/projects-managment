@@ -9,6 +9,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ProjectType extends AbstractType
 {
@@ -16,6 +18,9 @@ class ProjectType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Project::class,
+            'constraints' => [
+                new Callback([$this, 'validate']),
+            ],
         ]);
     }
 
@@ -24,9 +29,25 @@ class ProjectType extends AbstractType
         $builder
             ->add('title', TextType::class)
             ->add('description', TextType::class)
-            ->add('client', TextType::class)
-            ->add('company', TextType::class)
+            ->add('client', TextType::class, [
+                'required' => false
+            ])
+            ->add('company', TextType::class, [
+                'required' => false
+            ])
             ->add('save', SubmitType::class);
+    }
+
+    /**
+     * @param Project $data
+     * @param ExecutionContextInterface $context
+     */
+    public function validate(Project $data, ExecutionContextInterface $context): void
+    {
+        if (empty($data->getClient()) && empty($data->getCompany())) {
+            $context->buildViolation('Client or Company must to be filled!')
+                ->addViolation();
+        }
     }
 
 }
