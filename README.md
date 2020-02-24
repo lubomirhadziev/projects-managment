@@ -1,6 +1,13 @@
 # Projects managment system
 Custom jira platform
 
+## Requirements
+```
+installed docker
+installed docker-compose
+php version >= 7.2.5
+```
+
 ## 1. Install dependencies
 ```
 composer install
