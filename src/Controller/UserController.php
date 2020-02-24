@@ -82,7 +82,7 @@ class UserController extends AbstractController
         $errors = [];
 
         if ($request->isMethod('POST')) {
-            $response = $this->userRequester->validate($request->get('email'), $request->get('password'));
+            $response = $this->userRequester->create($request->get('email'), $request->get('password'));
             $errors = $response['validation_errors'];
 
             if (!$errors) {

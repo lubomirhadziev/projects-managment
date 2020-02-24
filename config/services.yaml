@@ -21,16 +21,19 @@ services:
 
   App\Services\Requester\Project:
     arguments:
+      $apiEndpoint: '%env(API_ENDPOINT_URL)%'
       $client: '@app.guzzle'
       $security: '@app.request'
 
   App\Services\Requester\Task:
     arguments:
+      $apiEndpoint: '%env(API_ENDPOINT_URL)%'
       $client: '@app.guzzle'
       $security: '@app.request'
 
   App\Services\Requester\User:
     arguments:
+      $apiEndpoint: '%env(API_ENDPOINT_URL)%'
       $client: '@app.guzzle'
       $security: '@app.request'
 

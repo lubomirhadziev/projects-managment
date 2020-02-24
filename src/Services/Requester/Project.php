@@ -32,6 +32,22 @@ class Project extends Api
     }
 
     /**
+     * @param ProjectEntity $project
+     * @return array
+     */
+    public function updateProject(ProjectEntity $project)
+    {
+        $data = [
+            'title' => $project->getTitle(),
+            'description' => $project->getDescription(),
+            'client' => $project->getClient(),
+            'company' => $project->getCompany(),
+        ];
+
+        return $this->makeRequest(sprintf('%s%s', self::PROJECTS_ENDPOINT, $project->getId()), 'PUT', $data);
+    }
+
+    /**
      * @param int $id
      * @return array
      */

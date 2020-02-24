@@ -8,7 +8,10 @@ use Symfony\Component\Security\Core\Security;
 
 abstract class Api
 {
-    const API_ENDPOINT = 'http://127.0.0.1:8001/api/';
+    /**
+     * @var string
+     */
+    private $apiEndpoint;
 
     /**
      * @var Client
@@ -21,15 +24,23 @@ abstract class Api
     protected $security;
 
     /**
+     * @param string $apiEndpoint
      * @param Client $client
      * @param Security $security
      */
-    public function __construct(Client $client, Security $security)
+    public function __construct(string $apiEndpoint, Client $client, Security $security)
     {
         $this->client = $client;
         $this->security = $security;
+        $this->apiEndpoint = $apiEndpoint;
     }
 
+    /**
+     * @param string $endpoint
+     * @param string $type
+     * @param array $data
+     * @return array
+     */
     protected function makeRequest(string $endpoint, string $type = 'GET', array $data = [])
     {
         $headers = [];
@@ -51,9 +62,13 @@ abstract class Api
         return json_decode($response->getBody(), true);
     }
 
+    /**
+     * @param string $uri
+     * @return string
+     */
     private function uri(string $uri)
     {
-        return sprintf('%s%s', self::API_ENDPOINT, $uri);
+        return sprintf('%s%s', $this->apiEndpoint, $uri);
     }
 
 }

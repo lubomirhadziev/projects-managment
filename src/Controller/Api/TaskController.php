@@ -7,10 +7,12 @@ use App\Repository\ProjectRepository;
 use App\Repository\TaskRepository;
 use App\Services\ApiResponse;
 use App\Services\Serializer;
+use App\Services\Utils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @package App\Controller\Api
@@ -49,10 +51,12 @@ class TaskController extends ApiController
     /**
      * @Route("/", name="create_task", methods={"POST"})
      * @param Request $request
+     * @param ValidatorInterface $validator
+     * @param Utils $utils
      * @return JsonResponse
      * @IsGranted("ROLE_USER")
      */
-    public function create(Request $request): JsonResponse
+    public function create(Request $request, ValidatorInterface $validator, Utils $utils): JsonResponse
     {
         $task = $this->serializer->deserializeModel($request->getContent(), Task::class);
 
@@ -61,22 +65,19 @@ class TaskController extends ApiController
             $task->setProject($project);
         }
 
-        $this->taskRepository->saveTask($task);
-
-        return $this->apiResponse->model(
-            ApiResponse::SUCCESS_CODE,
-            $this->serializer->serializeModel($task)
-        );
+        return $this->validateAndSave($task, $validator, $utils);
     }
 
     /**
      * @Route("/{id}", name="update_task", methods={"PUT"})
      * @param int $id
      * @param Request $request
+     * @param ValidatorInterface $validator
+     * @param Utils $utils
      * @return JsonResponse
      * @IsGranted("ROLE_USER")
      */
-    public function update(int $id, Request $request): JsonResponse
+    public function update(int $id, Request $request, ValidatorInterface $validator, Utils $utils): JsonResponse
     {
         $existingTask = $this->taskRepository->findOneBy(['id' => $id]);
 
@@ -87,12 +88,7 @@ class TaskController extends ApiController
             $task->setProject($project);
         }
 
-        $this->taskRepository->saveTask($task);
-
-        return $this->apiResponse->model(
-            ApiResponse::SUCCESS_CODE,
-            $this->serializer->serializeModel($task)
-        );
+        return $this->validateAndSave($task, $validator, $utils);
     }
 
     /**
@@ -143,6 +139,31 @@ class TaskController extends ApiController
         $this->taskRepository->removeTask($task);
 
         return $this->apiResponse->simple(ApiResponse::SUCCESS_CODE);
+    }
+
+
+    /**
+     * @param Task $task
+     * @param ValidatorInterface $validator
+     * @param Utils $utils
+     * @return JsonResponse
+     */
+    private function validateAndSave(Task $task, ValidatorInterface $validator, Utils $utils)
+    {
+        $errors = $validator->validate($task);
+        $validationErrors = [];
+
+        if (count($errors) > 0) {
+            $validationErrors = $utils->errorsToArray($errors);
+        } else {
+            $task = $this->taskRepository->saveTask($task);
+        }
+
+        return $this->apiResponse->model(
+            (!empty($validationErrors) ? ApiResponse::FAIL_CODE : ApiResponse::SUCCESS_CODE),
+            $this->serializer->serializeModel($task),
+            $validationErrors
+        );
     }
 
 }

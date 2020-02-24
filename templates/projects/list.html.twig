@@ -15,6 +15,8 @@
             <th scope="col">Description</th>
             <th scope="col">Client</th>
             <th scope="col">Company</th>
+            <th scope="col">Status</th>
+            <th scope="col">Duration</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -27,10 +29,15 @@
                 <td>{{ project.description|default('-') }}</td>
                 <td>{{ project.client|default('-') }}</td>
                 <td>{{ project.company|default('-') }}</td>
+                <td>{{ project.status|taskStatus }}</td>
+                <td>{{ project.duration }} days</td>
                 <td>
                     <a href="{{ path('list_tasks', {projectId: project.id}) }}" class="btn btn-sm btn-info">TASKS</a>
 
                     {% if app.user %}
+                        <a href="{{ path('edit_project', {id: project.id}) }}"
+                           class="btn btn-sm btn-warning">EDIT</a>
+
                         <a href="{{ path('delete_project', {id: project.id}) }}"
                            class="btn btn-sm btn-danger">DELETE</a>
                     {% endif %}

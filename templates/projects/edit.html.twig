@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>Edit project</h1>
+
+    {% if not app.user %}
+        <p class="alert alert-danger">You need to login first from <a href="{{ path('login') }}">here</a>.</p>
+    {% else %}
+
+        {% if errors %}
+            <div class="errors">
+                {% for error in errors %}
+                    <p class="alert alert-danger">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {{ form(form) }}
+
+    {% endif %}
+{% endblock %}

@@ -11,7 +11,12 @@ composer install
 docker-compose up -d
 ```
 
-## 3. Start server on port 8100
+## 3. Configure API endpoint url
+```
+by default API endpoint is http://127.0.0.1:8001 if you need to change this change API_ENDPOINT_URL from .env
+```
+
+## 4. Start server on port 8001
 ```
 symfony server:start
 ```

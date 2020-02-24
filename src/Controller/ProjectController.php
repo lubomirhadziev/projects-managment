@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\ProjectDto;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
 use App\Services\ApiResponse;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class ProjectController extends AbstractController
 {
@@ -49,7 +51,7 @@ class ProjectController extends AbstractController
     {
         $projects = $this->serializer->deserializeMultipleModel(
             $this->projectRequester->getAll(),
-            Project::class
+            ProjectDto::class
         );
 
         return $this->render('projects/list.html.twig', [
@@ -61,10 +63,54 @@ class ProjectController extends AbstractController
      * @Route("/project/new", name="create_project")
      * @param Request $request
      * @return RedirectResponse|Response
+     * @IsGranted("ROLE_USER")
      */
     public function createProject(Request $request)
     {
         $project = new Project();
+
+        return $this->renderForm('projects/new.html.twig', $project, $request);
+    }
+
+    /**
+     * @Route("/project/edit/{id}", name="edit_project")
+     * @param int $id
+     * @param Request $request
+     * @return RedirectResponse|Response
+     * @IsGranted("ROLE_USER")
+     */
+    public function editProject(int $id, Request $request)
+    {
+        $project = $this->serializer->deserializeModel(
+            $this->projectRequester->findProject($id),
+            Project::class
+        );
+
+        return $this->renderForm('projects/edit.html.twig', $project, $request, true);
+    }
+
+    /**
+     * @Route("/project/delete/{id}", name="delete_project")
+     * @param int $id
+     * @return RedirectResponse
+     * @IsGranted("ROLE_USER")
+     */
+    public function deleteProject(int $id)
+    {
+        $this->projectRequester->deleteProject($id);
+
+        return $this->redirectToRoute('list_projects');
+    }
+
+    /**
+     * @param string $template
+     * @param bool $isUpdate
+     * @param Project $project
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
+    private function renderForm(string $template, Project $project, Request $request, bool $isUpdate = false)
+    {
         $form = $this->createForm(ProjectType::class, $project);
         $errors = [];
 
@@ -72,7 +118,11 @@ class ProjectController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $newProject = $form->getData();
 
-            $response = $this->projectRequester->createProject($newProject);
+            if ($isUpdate) {
+                $response = $this->projectRequester->updateProject($newProject);
+            } else {
+                $response = $this->projectRequester->createProject($newProject);
+            }
             $errors = $response['validation_errors'];
 
             if (empty($errors)) {
@@ -80,22 +130,10 @@ class ProjectController extends AbstractController
             }
         }
 
-        return $this->render('projects/new.html.twig', [
+        return $this->render($template, [
             'form' => $form->createView(),
             'errors' => $errors
         ]);
-    }
-
-    /**
-     * @Route("/project/delete/{id}", name="delete_project")
-     * @param int $id
-     * @return RedirectResponse
-     */
-    public function deleteProject(int $id)
-    {
-        $this->projectRequester->deleteProject($id);
-
-        return $this->redirectToRoute('list_projects');
     }
 
 }

@@ -29,6 +29,8 @@
                 <td>{{ task.duration }} days</td>
                 <td>
                     {% if app.user %}
+                        <a href="{{ path('edit_task', {id: task.id}) }}" class="btn btn-sm btn-warning">EDIT</a>
+
                         <a href="{{ path('delete_task', {projectId: task.project.id, taskId: task.id}) }}"
                            class="btn btn-sm btn-danger">
                             DELETE

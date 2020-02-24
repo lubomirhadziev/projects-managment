@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\TaskDto;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Services\ApiResponse;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class TaskController extends AbstractController
 {
@@ -62,7 +64,7 @@ class TaskController extends AbstractController
 
         $tasks = $this->serializer->deserializeMultipleModel(
             $this->taskRequester->getAll($projectId),
-            Task::class
+            TaskDto::class
         );
 
         return $this->render('tasks/list.html.twig', [
@@ -76,6 +78,7 @@ class TaskController extends AbstractController
      * @param int $projectId
      * @param Request $request
      * @return RedirectResponse|Response
+     * @IsGranted("ROLE_USER")
      */
     public function createTask(int $projectId, Request $request)
     {
@@ -86,6 +89,50 @@ class TaskController extends AbstractController
 
         $task = new Task();
         $task->setProject($project);
+
+        return $this->renderForm('tasks/new.html.twig', $task, $project, $request);
+    }
+
+    /**
+     * @Route("/task/edit/{id}", name="edit_task")
+     * @param int $id
+     * @param Request $request
+     * @return RedirectResponse|Response
+     * @IsGranted("ROLE_USER")
+     */
+    public function editTask(int $id, Request $request)
+    {
+        $task = $this->serializer->deserializeModel(
+            $this->taskRequester->findTask($id),
+            Task::class
+        );
+
+        return $this->renderForm('tasks/edit.html.twig', $task, $task->getProject(), $request);
+    }
+
+    /**
+     * @Route("/task/delete/{projectId}/{taskId}", name="delete_task")
+     * @param int $projectId
+     * @param int $taskId
+     * @return RedirectResponse
+     * @IsGranted("ROLE_USER")
+     */
+    public function deleteProject(int $projectId, int $taskId)
+    {
+        $this->taskRequester->deleteTask($taskId);
+
+        return $this->redirectToRoute('list_tasks', ['projectId' => $projectId]);
+    }
+
+    /**
+     * @param string $template
+     * @param Task $task
+     * @param Project $project
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
+    private function renderForm(string $template, Task $task, Project $project, Request $request)
+    {
         $form = $this->createForm(TaskType::class, $task);
         $errors = [];
 
@@ -97,27 +144,14 @@ class TaskController extends AbstractController
             $errors = $response['validation_errors'];
 
             if ($response['code'] == ApiResponse::SUCCESS_CODE) {
-                return $this->redirectToRoute('list_tasks', ['projectId' => $projectId]);
+                return $this->redirectToRoute('list_tasks', ['projectId' => $project->getId()]);
             }
         }
 
-        return $this->render('tasks/new.html.twig', [
+        return $this->render($template, [
             'form' => $form->createView(),
             'errors' => $errors
         ]);
-    }
-
-    /**
-     * @Route("/task/delete/{projectId}/{taskId}", name="delete_task")
-     * @param int $projectId
-     * @param int $taskId
-     * @return RedirectResponse
-     */
-    public function deleteProject(int $projectId, int $taskId)
-    {
-        $this->taskRequester->deleteTask($taskId);
-
-        return $this->redirectToRoute('list_tasks', ['projectId' => $projectId]);
     }
 
 }

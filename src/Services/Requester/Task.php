@@ -37,6 +37,33 @@ class Task extends Api
     }
 
     /**
+     * @param TaskEntity $task
+     * @return array
+     */
+    public function updateTask(TaskEntity $task)
+    {
+        $data = [
+            'title' => $task->getTitle(),
+            'description' => $task->getDescription(),
+            'status' => $task->getStatus(),
+            'duration' => $task->getDuration(),
+            'project_id' => $task->getProject()->getId()
+        ];
+
+        return $this->makeRequest(sprintf('%s%s', self::TASKS_ENDPOINT, $task->getId()), 'POST', $data);
+    }
+
+    /**
+     * @param int $id
+     * @return array
+     */
+    public function findTask(int $id)
+    {
+        $response = $this->makeRequest(sprintf('%sfind/%s', self::TASKS_ENDPOINT, $id));
+        return $response['data'];
+    }
+
+    /**
      * @param int $id
      * @return array
      */

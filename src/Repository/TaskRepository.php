@@ -38,7 +38,8 @@ class TaskRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('t')
             ->where('t.project = :project')
-            ->setParameter('project', $project);
+            ->setParameter('project', $project)
+            ->orderBy('t.id', 'desc');
 
         return $qb->getQuery()->execute();
     }

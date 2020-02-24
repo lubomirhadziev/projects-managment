@@ -46,37 +46,25 @@ class ProjectController extends ApiController
     {
         $project = $this->serializer->deserializeModel($request->getContent(), Project::class);
 
-        $errors = $validator->validate($project);
-        $validationErrors = [];
-
-        if (count($errors) > 0) {
-            $validationErrors = $utils->errorsToArray($errors);
-        } else {
-            $project = $this->projectRepository->saveProject($project);
-        }
-
-        return $this->apiResponse->model(
-            (!empty($validationErrors) ? ApiResponse::FAIL_CODE : ApiResponse::SUCCESS_CODE),
-            $this->serializer->serializeModel($project),
-            $validationErrors
-        );
+        return $this->validateAndSave($project, $validator, $utils);
     }
 
     /**
      * @Route("/{id}", name="update_project", methods={"PUT"})
      * @param int $id
      * @param Request $request
+     * @param ValidatorInterface $validator
+     * @param Utils $utils
      * @return JsonResponse
      * @IsGranted("ROLE_USER")
      */
-    public function update(int $id, Request $request): JsonResponse
+    public function update(int $id, Request $request, ValidatorInterface $validator, Utils $utils): JsonResponse
     {
         $existingProject = $this->projectRepository->findOneBy(['id' => $id]);
 
         $project = $this->serializer->deserializeModel($request->getContent(), Project::class, $existingProject);
-        $this->projectRepository->saveProject($project);
 
-        return $this->apiResponse->model(ApiResponse::SUCCESS_CODE, $this->serializer->serializeModel($project));
+        return $this->validateAndSave($project, $validator, $utils);
     }
 
     /**
@@ -99,7 +87,7 @@ class ProjectController extends ApiController
      */
     public function getAll(): JsonResponse
     {
-        $projects = $this->projectRepository->findAll();
+        $projects = $this->projectRepository->findBy([], ['id' => 'desc']);
 
         return $this->apiResponse->model(
             ApiResponse::SUCCESS_CODE,
@@ -124,6 +112,30 @@ class ProjectController extends ApiController
         $this->projectRepository->removeProject($project);
 
         return $this->apiResponse->simple(ApiResponse::SUCCESS_CODE);
+    }
+
+    /**
+     * @param Project $project
+     * @param ValidatorInterface $validator
+     * @param Utils $utils
+     * @return JsonResponse
+     */
+    private function validateAndSave(Project $project, ValidatorInterface $validator, Utils $utils)
+    {
+        $errors = $validator->validate($project);
+        $validationErrors = [];
+
+        if (count($errors) > 0) {
+            $validationErrors = $utils->errorsToArray($errors);
+        } else {
+            $project = $this->projectRepository->saveProject($project);
+        }
+
+        return $this->apiResponse->model(
+            (!empty($validationErrors) ? ApiResponse::FAIL_CODE : ApiResponse::SUCCESS_CODE),
+            $this->serializer->serializeModel($project),
+            $validationErrors
+        );
     }
 
 }

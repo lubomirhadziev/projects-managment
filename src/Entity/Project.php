@@ -112,10 +112,102 @@ class Project
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|Task[]
      */
     public function tasks(): Collection
     {
         return $this->tasks;
+    }
+
+    /**
+     * Sum duration of all tasks in current project
+     * @return int
+     */
+    public function getDuration()
+    {
+        $duration = 0;
+
+        foreach ($this->tasks() as $task) {
+            $duration += $task->getDuration();
+        }
+
+        return $duration;
+    }
+
+    /**
+     * Detect status of the project
+     * @return int
+     */
+    public function getStatus()
+    {
+        $status = Task::STATUS_NEW;
+        $status = $this->applyPendingStatus($status);
+        $status = $this->applyFailedStatus($status);
+        $status = $this->applyDoneStatus($status);
+
+        return $status;
+    }
+
+    /**
+     * @param int $currentStatus
+     * @return string
+     */
+    private function applyPendingStatus(int $currentStatus)
+    {
+        foreach ($this->tasks() as $task) {
+            if (
+                ($task->getStatus() == Task::STATUS_PENDING || $task->getStatus() > Task::STATUS_PENDING)
+                && Task::STATUS_PENDING > $currentStatus
+            ) {
+                $currentStatus = Task::STATUS_PENDING;
+                break;
+            }
+        }
+
+        return $currentStatus;
+    }
+
+    /**
+     * @param int $currentStatus
+     * @return string
+     */
+    private function applyFailedStatus(int $currentStatus)
+    {
+        $allTasksFailed = true;
+
+        foreach ($this->tasks() as $task) {
+            if ($task->getStatus() != Task::STATUS_FAILED) {
+                $allTasksFailed = false;
+                break;
+            }
+        }
+
+        if ($allTasksFailed && !empty($this->tasks())) {
+            return Task::STATUS_FAILED;
+        }
+
+        return $currentStatus;
+    }
+
+    /**
+     * @param int $currentStatus
+     * @return string
+     */
+    private function applyDoneStatus(int $currentStatus)
+    {
+        $allTasksDone = true;
+
+        foreach ($this->tasks() as $task) {
+            if ($task->getStatus() != Task::STATUS_DONE) {
+                $allTasksDone = false;
+                break;
+            }
+        }
+
+        if ($allTasksDone && !empty($this->tasks())) {
+            return Task::STATUS_DONE;
+        }
+
+        return $currentStatus;
     }
 }
