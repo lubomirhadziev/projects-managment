@@ -1,11 +1,16 @@
 # Projects managment system
-Custom jira platform
+The project simulate API and Consumer (working with API endpoints)
 
 ## Requirements
 ```
 installed docker
 installed docker-compose
 php version >= 7.2.5
+```
+
+## Example request to API endpoints
+```
+use Insomnia Rest Client and import ./Insomnia-rest-client.json file
 ```
 
 ## 1. Install dependencies
